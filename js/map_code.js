@@ -6,7 +6,7 @@
 
 // Create a Leaflet map in the "map" div
 // setView([lat, lon], zoom)
-const map = L.map('map').setView([43.933611, -120.558333], 15);
+const map = L.map('map').setView([43.933611, -120.558333], 7);
 
 
 // ============================================
@@ -28,3 +28,99 @@ map.zoomControl.setPosition('topright');
 
 // Add a scale bar
 L.control.scale().addTo(map);
+
+
+// ============================================
+// Step 4: Create layer groups
+// ============================================
+
+// Layer groups allow toggling layers on/off
+const lineLayer = L.layerGroup().addTo(map);
+const pointLayer = L.layerGroup().addTo(map);
+const polygonLayer = L.layerGroup().addTo(map);
+
+// UI control to toggle layers
+L.control.layers(null, {
+  'Cities': pointLayer,
+  'Roads': lineLayer,
+  'County Boundaries': polygonLayer
+}).addTo(map);
+
+
+// ============================================
+// Step 5: Load point data (Cities)
+// ============================================
+
+fetch('data/oregon_cities.json')
+  .then(res => res.json())
+  .then(data => {L.geoJSON(data, {
+
+      // Style points as circle markers
+      pointToLayer: function(feature, latlng) {
+        return L.circleMarker(latlng, {
+          radius: 6,
+          fillColor: '#d95f02',
+          color: '#ffffff',
+          weight: 1,
+          fillOpacity: 0.9
+        });
+      },
+
+      // Add popups
+      onEachFeature: function(feature, layer) {
+        const name = feature.properties.name || 'Restaurant';
+        layer.bindPopup(`<strong>${name}</strong>`);
+      }
+
+    }).addTo(pointLayer);
+
+  })
+  .catch(err => console.error('Error loading restaurants:', err));
+
+
+// ============================================
+// Step 6: Load line data (Roads)
+// ============================================
+
+fetch('data/oregon_roads.json')
+  .then(res => res.json())
+  .then(data => {L.geoJSON(data, {
+
+      // Style lines
+      style: function(feature) {
+        return {
+          color: '#1b9e77',
+          weight: 3
+        };
+      },
+    }).addTo(lineLayer);
+
+  })
+  .catch(err => console.error('Error loading cycleways:', err));
+
+
+// ============================================
+// Step 7: Load polygon data (County boundaries)
+// ============================================
+
+fetch('data/oregon_counties.json')
+  .then(res => res.json())
+  .then(data => {
+
+    // Add polygon and immediately fit to its bounds
+    map.fitBounds(
+      L.geoJSON(data, {
+        style: function() {
+          return {
+            color: '#7570b3',
+            weight: 3,
+            fill: false
+          };
+        }
+      })
+      .addTo(polygonLayer)
+      .getBounds()
+    );
+
+  })
+  .catch(err => console.error('Error loading boundary:', err));
