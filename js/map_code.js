@@ -59,8 +59,8 @@ fetch('data/oregon_cities.json')
       pointToLayer: function(feature, latlng) {
         return L.circleMarker(latlng, {
           radius: 6,
-          fillColor: '#d95f02',
-          color: '#ffffff',
+          fillColor: '#0077B6',
+          color: '#03045E',
           weight: 1,
           fillOpacity: 0.9
         });
@@ -68,14 +68,14 @@ fetch('data/oregon_cities.json')
 
       // Add popups
       onEachFeature: function(feature, layer) {
-        const name = feature.properties.name || 'Restaurant';
+        const name = feature.properties.NAME || 'NAME';
         layer.bindPopup(`<strong>${name}</strong>`);
       }
 
     }).addTo(pointLayer);
 
   })
-  .catch(err => console.error('Error loading restaurants:', err));
+  .catch(err => console.error('Error loading cities:', err));
 
 
 // ============================================
@@ -89,14 +89,14 @@ fetch('data/oregon_roads.json')
       // Style lines
       style: function(feature) {
         return {
-          color: '#1b9e77',
+          color: '#CC5500',
           weight: 3
         };
       },
     }).addTo(lineLayer);
 
   })
-  .catch(err => console.error('Error loading cycleways:', err));
+  .catch(err => console.error('Error loading roads:', err));
 
 
 // ============================================
@@ -112,8 +112,8 @@ fetch('data/oregon_counties.json')
       L.geoJSON(data, {
         style: function() {
           return {
-            color: '#7570b3',
-            weight: 3,
+            color: '#7D7F7C',
+            weight: 2,
             fill: false
           };
         }
